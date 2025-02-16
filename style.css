@@ -1,7 +1,11 @@
+/* Основные стили */
 body {
-    font-family: Arial, sans-serif;
-    padding: 15px;
-    background-color: #f8f9fa;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(160deg, #1a1a1a 0%, #2d3436 100%);
+    min-height: 100vh;
+    color: #fff;
 }
 
 .container {
@@ -9,47 +13,144 @@ body {
     width: 100%;
     max-width: 500px;
     margin: 0 auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 15px;
+    min-height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-@media (max-width: 480px) {
-    .container {
-        padding: 15px;
-    }
-}
-
+/* Заголовки */
 h1 {
     text-align: center;
-}
-
-input, select, button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 16px;
-}
-
-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #218838;
+    color: #00c3ff;
+    font-size: 2.2rem;
+    margin: 20px 0;
+    text-shadow: 0 2px 4px rgba(0, 195, 255, 0.3);
+    font-weight: 700;
 }
 
 h2 {
     text-align: center;
-    margin-top: 20px;
-    color: #007bff;
+    margin: 25px 0 15px;
+    color: #00c3ff;
+    font-size: 1.5rem;
+}
+
+/* Элементы форм */
+.input-group {
+    margin: 15px 0;
+    position: relative;
+}
+
+input, select {
+    width: 100%;
+    padding: 14px 15px;
+    border: 2px solid #3d3d3d;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #00c3ff;
+    background: rgba(0, 195, 255, 0.05);
+    outline: none;
+}
+
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300c3ff'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+/* Кнопки */
+button {
+    width: 100%;
+    padding: 16px;
+    margin: 20px 0;
+    background: linear-gradient(135deg, #00c3ff 0%, #0066ff 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 195, 255, 0.4);
+}
+
+/* Результаты */
+.results-box {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px 0;
+    border: 1px solid rgba(0, 195, 255, 0.2);
 }
 
 p {
     text-align: center;
-    font-size: 14px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #a0a0a0;
+    margin: 10px 0;
+}
+
+/* Адаптация под маленькие экраны */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+        margin: 15px 0;
+    }
+    
+    button {
+        padding: 14px;
+        font-size: 1rem;
+    }
+    
+    input, select {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Анимации */
+@keyframes dash-glow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.dynamic-border {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.dynamic-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #00c3ff, #0066ff, #00c3ff);
+    background-size: 400% 400%;
+    animation: dash-glow 8s ease infinite;
+    z-index: -1;
 }
