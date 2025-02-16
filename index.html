@@ -54,5 +54,20 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand(); // Разворачивает на весь экран
+    tg.MainButton.text = "Рассчитать"; // Изменяем текст кнопки
+    tg.MainButton.show(); // Показываем кнопку
+
+    function calculateAndSendResult() {
+        calculate(); // Запускаем расчёт
+        let result = document.getElementById("result").innerText;
+        tg.sendData(result); // Отправляем результат в бота
+    }
+
+    tg.MainButton.onClick(calculateAndSendResult);
+</script>
 </body>
 </html>
