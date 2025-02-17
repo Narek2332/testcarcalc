@@ -44,8 +44,6 @@ function connectWebSocket() {
         }
     };
 
-    
-
 // Запускаем подключение к WebSocket
 connectWebSocket();
 }
