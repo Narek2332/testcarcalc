@@ -2,19 +2,38 @@ let usdtToUsdRate = 1; // Курс USDT/USD
 let usdToRubRate = 75; // Курс USD/RUB
 
 // Подключение к WebSocket Bybit для получения курса USDT/USD
-const ws = new WebSocket('wss://stream.bybit.com/v5/public/linear');
+const bybitWS = new WebSocket('wss://stream.bybit.com/v5/public/spot');
 
-ws.onopen = () => {
-    console.log('✅ WebSocket подключен к Bybit');
-    ws.send(JSON.stringify({
+// Найти элемент на странице для обновления
+const usdtPriceElement = document.getElementById("usdt-price");
+
+// Подключаемся к Bybit WebSocket
+bybitWS.onopen = () => {
+    console.log('✅ WebSocket Bybit подключен');
+    bybitWS.send(JSON.stringify({
         op: "subscribe",
-        args: ["tickers.USDTUSDT"]
+        args: ["tickers.USDTUSD"] // ← ПРАВИЛЬНЫЙ ТИКЕР
     }));
 };
 
-ws.onmessage = (event) => {
+// Получаем курс USDT/USD и обновляем интерфейс
+bybitWS.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log('📈 Получены данные:', data);
+    
+    if (data?.topic === "tickers.USDTUSD" && data?.data?.lastPrice) {
+        usdtToUsdRate = parseFloat(data.data.lastPrice);
+        console.log(`📈 Курс USDT/USD: ${usdtToUsdRate}`);
+        
+        // Обновляем HTML
+        if (usdtPriceElement) {
+            usdtPriceElement.innerText = `Курс USDT/USD: ${usdtToUsdRate}`;
+        }
+    }
+};
+
+// Обработка ошибок
+bybitWS.onerror = (error) => {
+    console.error("❌ Ошибка WebSocket:", error);
 };
 
 
