@@ -4,8 +4,8 @@ let usdToRubRate = 75; // Курс USD/RUB
 // Подключение к WebSocket Coinbase для получения курса USDT/USD
 const coinbaseWS = new WebSocket('wss://ws-feed.pro.coinbase.com');
 
-// Найти элемент на странице для обновления
-const usdtPriceElement = document.getElementById("usdt-price");
+// Находим элемент на странице для отображения курса USDT/USD
+const usdtUsdRateElement = document.getElementById("usdt-usd-rate");
 
 // Подключаемся к Coinbase WebSocket
 coinbaseWS.onopen = () => {
@@ -23,14 +23,14 @@ coinbaseWS.onopen = () => {
 coinbaseWS.onmessage = (event) => {
     const data = JSON.parse(event.data);
     
-    // Фильтруем сообщения с типом 'ticker'
+    // Фильтруем сообщения с типом 'ticker' и парой USDT-USD
     if (data?.type === 'ticker' && data?.product_id === 'USDT-USD' && data?.price) {
         const usdtToUsdRate = parseFloat(data.price); // Текущая цена
         console.log(`📈 Курс USDT/USD: ${usdtToUsdRate}`);
         
         // Обновляем HTML
-        if (usdtPriceElement) {
-            usdtPriceElement.innerText = `Курс USDT/USD: ${usdtToUsdRate}`;
+        if (usdtUsdRateElement) {
+            usdtUsdRateElement.innerText = usdtToUsdRate.toFixed(4); // Округляем до 4 знаков
         }
     }
 };
@@ -38,11 +38,17 @@ coinbaseWS.onmessage = (event) => {
 // Обработка ошибок
 coinbaseWS.onerror = (error) => {
     console.error("❌ Ошибка WebSocket:", error);
+    if (usdtUsdRateElement) {
+        usdtUsdRateElement.innerText = "Ошибка загрузки";
+    }
 };
 
 // Обработка закрытия соединения
 coinbaseWS.onclose = () => {
     console.log('WebSocket соединение закрыто');
+    if (usdtUsdRateElement) {
+        usdtUsdRateElement.innerText = "Соединение закрыто";
+    }
 };
 
 // Получение курса USD/RUB через прокси-сервер
