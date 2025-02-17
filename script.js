@@ -12,7 +12,7 @@ bybitWS.onopen = () => {
     console.log('✅ WebSocket Bybit подключен');
     bybitWS.send(JSON.stringify({
         op: "subscribe",
-        args: ["tickers.USDTUSD"] // ← ПРАВИЛЬНЫЙ ТИКЕР
+        args: ["tickers.USDTUSDT"] // ← ПРАВИЛЬНЫЙ ТИКЕР
     }));
 };
 
