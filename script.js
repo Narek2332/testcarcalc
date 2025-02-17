@@ -8,7 +8,7 @@ ws.onopen = () => {
     console.log('✅ WebSocket подключен к Bybit');
     ws.send(JSON.stringify({
         op: "subscribe",
-        args: ["tickers.USDTUSD"]
+        args: ["tickers.USDTUSDT"]
     }));
 };
 
