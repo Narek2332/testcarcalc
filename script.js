@@ -1,27 +1,31 @@
 let usdtToUsdRate = 1; // Курс USDT/USD
 let usdToRubRate = 75; // Курс USD/RUB
 
-// Подключение к WebSocket Bybit для получения курса USDT/USD
-const bybitWS = new WebSocket('wss://stream.bybit.com/v5/public/spot');
+// Подключение к WebSocket Coinbase для получения курса USDT/USD
+const coinbaseWS = new WebSocket('wss://ws-feed.pro.coinbase.com');
 
 // Найти элемент на странице для обновления
 const usdtPriceElement = document.getElementById("usdt-price");
 
-// Подключаемся к Bybit WebSocket
-bybitWS.onopen = () => {
-    console.log('✅ WebSocket Bybit подключен');
-    bybitWS.send(JSON.stringify({
-        op: "subscribe",
-        args: ["tickers.USDTUSDT"] // ← ПРАВИЛЬНЫЙ ТИКЕР
+// Подключаемся к Coinbase WebSocket
+coinbaseWS.onopen = () => {
+    console.log('✅ WebSocket Coinbase подключен');
+    
+    // Подписка на тикер для пары USDT-USD
+    coinbaseWS.send(JSON.stringify({
+        type: 'subscribe',
+        product_ids: ['USDT-USD'], // Пара USDT/USD
+        channels: ['ticker'] // Канал для получения обновлений курса
     }));
 };
 
 // Получаем курс USDT/USD и обновляем интерфейс
-bybitWS.onmessage = (event) => {
+coinbaseWS.onmessage = (event) => {
     const data = JSON.parse(event.data);
     
-    if (data?.topic === "tickers.USDTUSD" && data?.data?.lastPrice) {
-        usdtToUsdRate = parseFloat(data.data.lastPrice);
+    // Фильтруем сообщения с типом 'ticker'
+    if (data?.type === 'ticker' && data?.product_id === 'USDT-USD' && data?.price) {
+        const usdtToUsdRate = parseFloat(data.price); // Текущая цена
         console.log(`📈 Курс USDT/USD: ${usdtToUsdRate}`);
         
         // Обновляем HTML
@@ -32,13 +36,13 @@ bybitWS.onmessage = (event) => {
 };
 
 // Обработка ошибок
-bybitWS.onerror = (error) => {
+coinbaseWS.onerror = (error) => {
     console.error("❌ Ошибка WebSocket:", error);
 };
 
-
-ws.onerror = (error) => {
-    console.error('WebSocket ошибка:', error);
+// Обработка закрытия соединения
+coinbaseWS.onclose = () => {
+    console.log('WebSocket соединение закрыто');
 };
 
 // Получение курса USD/RUB через прокси-сервер
