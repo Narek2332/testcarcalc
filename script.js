@@ -2,10 +2,10 @@ let usdtToUsdRate = 1; // Курс USDT/USD
 let usdToRubRate = 75; // Курс USD/RUB
 
 // Подключение к WebSocket Bybit для получения курса USDT/USD
-const ws = new WebSocket('wss://stream.bybit.com/v5/public/spot');
+const ws = new WebSocket('wss://stream.bybit.com/v5/public/linear');
 
 ws.onopen = () => {
-    console.log('WebSocket подключен');
+    console.log('✅ WebSocket подключен к Bybit');
     ws.send(JSON.stringify({
         op: "subscribe",
         args: ["tickers.USDTUSD"]
@@ -14,12 +14,9 @@ ws.onopen = () => {
 
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    if (data.topic === "tickers.USDTUSD" && data.type === "snapshot") {
-        usdtToUsdRate = parseFloat(data.data.lastPrice);
-        document.getElementById("usdt-usd-rate").innerText = usdtToUsdRate.toFixed(4);
-        console.log('Текущий курс USDT/USD:', usdtToUsdRate);
-    }
+    console.log('📈 Получены данные:', data);
 };
+
 
 ws.onerror = (error) => {
     console.error('WebSocket ошибка:', error);
