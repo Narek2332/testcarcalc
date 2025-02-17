@@ -44,23 +44,11 @@ function connectWebSocket() {
         }
     };
 
-    // Обработка закрытия соединения
-    coinbaseWS.onclose = () => {
-        console.log('WebSocket соединение закрыто. Попытка переподключения...');
-        if (usdtUsdRateElement) {
-            usdtUsdRateElement.innerText = "Переподключение...";
-        }
-
-        // Переподключение через 5 секунд
-        setTimeout(() => {
-            connectWebSocket(); // Повторное подключение
-        }, 5000);
-    };
-}
+    
 
 // Запускаем подключение к WebSocket
 connectWebSocket();
-
+}
 // Получение курса USD/RUB через прокси-сервер
 async function getUsdToRubRate() {
     try {
