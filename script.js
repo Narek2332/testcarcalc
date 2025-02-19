@@ -1,5 +1,5 @@
-let usdtToRubRate = 1; // Курс USDT/RUB
-let usdToRubRate = 75; // Курс USD/RUB
+let usdtToRubRate = 91; // Курс USDT/RUB
+let usdToRubRate = 91; // Курс USD/RUB
 
 // Находим элемент на странице для отображения курса USDT/RUB
 const usdtRubRateElement = document.getElementById("usdt-rub-rate");
