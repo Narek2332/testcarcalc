@@ -5,53 +5,30 @@ let usdToRubRate = 91; // Курс USD/RUB
 const usdtRubRateElement = document.getElementById("usdt-rub-rate");
 
 // Функция для подключения к WebSocket Binance
-function connectBinanceWebSocket() {
-    const binanceWS = new WebSocket('wss://stream.binance.com:9443/ws/usdtrub@ticker');
+// 
 
-    // Подключение к Binance WebSocket
-    binanceWS.onopen = () => {
-        console.log('✅ WebSocket Binance подключен');
-    };
+const bybitWS = new WebSocket('wss://stream.bybit.com/v5/public/spot');
 
-    // Получаем курс USDT/RUB и обновляем интерфейс
-    binanceWS.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        
-        // Извлекаем текущую цену
-        const usdtToRubRate = parseFloat(data.c); // Последняя цена
+bybitWS.onopen = () => {
+    console.log('✅ WebSocket Bybit подключен');
+    bybitWS.send(JSON.stringify({
+        op: "subscribe",
+        args: ["tickers.USDTRUB"] // Подписка на пару USDT/RUB
+    }));
+};
+
+bybitWS.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    
+    if (data?.topic === "tickers.USDTRUB" && data?.data?.lastPrice) {
+        const usdtToRubRate = parseFloat(data.data.lastPrice);
         console.log(`📈 Курс USDT/RUB: ${usdtToRubRate}`);
         
-        // Обновляем HTML
         if (usdtRubRateElement) {
-            usdtRubRateElement.innerText = usdtToRubRate.toFixed(2); // Округляем до 2 знаков
+            usdtRubRateElement.innerText = usdtToRubRate.toFixed(2);
         }
-    };
-
-    // Обработка ошибок
-    binanceWS.onerror = (error) => {
-        console.error("❌ Ошибка WebSocket:", error);
-        if (usdtRubRateElement) {
-            usdtRubRateElement.innerText = "Ошибка загрузки";
-        }
-    };
-
-    // Обработка закрытия соединения
-    binanceWS.onclose = () => {
-        console.log('WebSocket соединение закрыто. Попытка переподключения...');
-        if (usdtRubRateElement) {
-            usdtRubRateElement.innerText = "Переподключение...";
-        }
-
-        // Переподключение через 5 секунд
-        setTimeout(() => {
-            connectBinanceWebSocket(); // Повторное подключение
-        }, 5000);
-    };
-}
-
-// Запускаем подключение к WebSocket Binance
-connectBinanceWebSocket();
-
+    }
+};
 
 // Получение курса USD/RUB через прокси-сервер
 async function getUsdToRubRate() {
