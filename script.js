@@ -4,31 +4,35 @@ let usdToRubRate = 91; // Курс USD/RUB
 // Находим элемент на странице для отображения курса USDT/RUB
 const usdtRubRateElement = document.getElementById("usdt-rub-rate");
 
-// Функция для подключения к WebSocket Binance
-// 
+// Функция для получения курса USDT/RUB
+async function fetchUsdtRubRate() {
+    try {
+        // Используем API для получения курса USDT/RUB
+        const response = await fetch('https://api.cryptonator.com/api/ticker/usdt-rub');
+        const data = await response.json();
 
-const bybitWS = new WebSocket('wss://stream.bybit.com/v5/public/spot');
-
-bybitWS.onopen = () => {
-    console.log('✅ WebSocket Bybit подключен');
-    bybitWS.send(JSON.stringify({
-        op: "subscribe",
-        args: ["tickers.USDTRUB"] // Подписка на пару USDT/RUB
-    }));
-};
-
-bybitWS.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    
-    if (data?.topic === "tickers.USDTRUB" && data?.data?.lastPrice) {
-        const usdtToRubRate = parseFloat(data.data.lastPrice);
-        console.log(`📈 Курс USDT/RUB: ${usdtToRubRate}`);
-        
+        if (data.success) {
+            const usdtToRubRate = parseFloat(data.ticker.price); // Текущая цена
+            console.log(`📈 Курс USDT/RUB: ${usdtToRubRate}`);
+            
+            // Обновляем HTML
+            if (usdtRubRateElement) {
+                usdtRubRateElement.innerText = usdtToRubRate.toFixed(2); // Округляем до 2 знаков
+            }
+        } else {
+            throw new Error('Ошибка получения данных');
+        }
+    } catch (error) {
+        console.error("❌ Ошибка загрузки курса USDT/RUB:", error);
         if (usdtRubRateElement) {
-            usdtRubRateElement.innerText = usdtToRubRate.toFixed(2);
+            usdtRubRateElement.innerText = "Ошибка загрузки";
         }
     }
-};
+}
+
+// Получаем курс каждые 10 секунд
+fetchUsdtRubRate(); // Первый запрос
+setInterval(fetchUsdtRubRate, 10000); // Повторяем каждые 10 секунд
 
 // Получение курса USD/RUB через прокси-сервер
 async function getUsdToRubRate() {
