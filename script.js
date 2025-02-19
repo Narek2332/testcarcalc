@@ -1,52 +1,58 @@
-let usdtToUsdRate = 1; // Курс USDT/USD
+let usdtToRubRate = 1; // Курс USDT/RUB
 let usdToRubRate = 75; // Курс USD/RUB
 
-// Находим элемент на странице для отображения курса USDT/USD
-const usdtUsdRateElement = document.getElementById("usdt-usd-rate");
+// Находим элемент на странице для отображения курса USDT/RUB
+const usdtRubRateElement = document.getElementById("usdt-rub-rate");
 
-// Функция для подключения к WebSocket
-function connectWebSocket() {
-    const coinbaseWS = new WebSocket('wss://ws-feed.pro.coinbase.com');
+// Функция для подключения к WebSocket Binance
+function connectBinanceWebSocket() {
+    const binanceWS = new WebSocket('wss://stream.binance.com:9443/ws/usdtrub@ticker');
 
-    // Подключение к Coinbase WebSocket
-    coinbaseWS.onopen = () => {
-        console.log('✅ WebSocket Coinbase подключен');
-        
-        // Подписка на тикер для пары USDT-USD
-        coinbaseWS.send(JSON.stringify({
-            type: 'subscribe',
-            product_ids: ['USDT-USD'], // Пара USDT/USD
-            channels: ['ticker'] // Канал для получения обновлений курса
-        }));
+    // Подключение к Binance WebSocket
+    binanceWS.onopen = () => {
+        console.log('✅ WebSocket Binance подключен');
     };
 
-    // Получаем курс USDT/USD и обновляем интерфейс
-    coinbaseWS.onmessage = (event) => {
+    // Получаем курс USDT/RUB и обновляем интерфейс
+    binanceWS.onmessage = (event) => {
         const data = JSON.parse(event.data);
         
-        // Фильтруем сообщения с типом 'ticker' и парой USDT-USD
-        if (data?.type === 'ticker' && data?.product_id === 'USDT-USD' && data?.price) {
-            const usdtToUsdRate = parseFloat(data.price); // Текущая цена
-            console.log(`📈 Курс USDT/USD: ${usdtToUsdRate}`);
-            
-            // Обновляем HTML
-            if (usdtUsdRateElement) {
-                usdtUsdRateElement.innerText = usdtToUsdRate.toFixed(4); // Округляем до 4 знаков
-            }
+        // Извлекаем текущую цену
+        const usdtToRubRate = parseFloat(data.c); // Последняя цена
+        console.log(`📈 Курс USDT/RUB: ${usdtToRubRate}`);
+        
+        // Обновляем HTML
+        if (usdtRubRateElement) {
+            usdtRubRateElement.innerText = usdtToRubRate.toFixed(2); // Округляем до 2 знаков
         }
     };
 
     // Обработка ошибок
-    coinbaseWS.onerror = (error) => {
+    binanceWS.onerror = (error) => {
         console.error("❌ Ошибка WebSocket:", error);
-        if (usdtUsdRateElement) {
-            usdtUsdRateElement.innerText = "Ошибка загрузки";
+        if (usdtRubRateElement) {
+            usdtRubRateElement.innerText = "Ошибка загрузки";
         }
     };
 
-// Запускаем подключение к WebSocket
-connectWebSocket();
+    // Обработка закрытия соединения
+    binanceWS.onclose = () => {
+        console.log('WebSocket соединение закрыто. Попытка переподключения...');
+        if (usdtRubRateElement) {
+            usdtRubRateElement.innerText = "Переподключение...";
+        }
+
+        // Переподключение через 5 секунд
+        setTimeout(() => {
+            connectBinanceWebSocket(); // Повторное подключение
+        }, 5000);
+    };
 }
+
+// Запускаем подключение к WebSocket Binance
+connectBinanceWebSocket();
+
+
 // Получение курса USD/RUB через прокси-сервер
 async function getUsdToRubRate() {
     try {
@@ -84,23 +90,53 @@ async function calculate() {
 
         // Логистика
         let logisticsUsdt = country === "USA" ? 4105 : 4050;
-        let logisticsRub = 110000; // Брокерские услуги
+        let logisticsRub = 110000; // Брокерские услуги / ЕЛПТС
 
         // Конвертируем логистику в рубли
-        const logisticsUsd = logisticsUsdt * usdtToUsdRate;
-        const logisticsTotal = logisticsUsd * usdToRubRate + logisticsRub;
+        const logisticsRubC = logisticsUsdt * usdtToRubRate;
+        const logisticsTotal = logisticsRubC + logisticsRub;
 
         // Таможня
-        let customs = price * 0.485; // 48.5% от цены авто (пример)
+        let customs = 0;
+        if (age === "0-3") {
+            customs = price * 0.485; // 48.5%
+        } else {
+            if (declarant === "individual") {
+                if (engineType === "petrol-diesel") {
+                    if (engineVolume === "1.5-2.0") customs = 5700;
+                    else if (engineVolume === "2.0-2.5") customs = 7860;
+                    else if (engineVolume === "2.5-3.0") customs = 9400;
+                }
+                if (age === "5-7") {
+                    if (engineVolume === "1.5-2.0") customs = 10000;
+                    else if (engineVolume === "2.0-2.5") customs = 13000;
+                    else if (engineVolume === "2.5-3.0") customs = 15600;
+                }
+            } else if (declarant === "legal") {
+                // Добавляем коммерческий утиль для юр. лиц
+                const util = engineVolume === "1.5-2.0" ? 1174000 : 2840000;
+                if (engineType === "petrol-diesel") {
+                    if (engineVolume === "1.5-2.0") customs = 5700 * usdToRubRate + util;
+                    else if (engineVolume === "2.0-2.5") customs = 7860 * usdToRubRate + util;
+                    else if (engineVolume === "2.5-3.0") customs = 9400 * usdToRubRate + util;
+                }
+                if (age === "5-7") {
+                    if (engineVolume === "1.5-2.0") customs = 10000 * usdToRubRate + util;
+                    else if (engineVolume === "2.0-2.5") customs = 13000 * usdToRubRate + util;
+                    else if (engineVolume === "2.5-3.0") customs = 15600 * usdToRubRate + util;
+                }
+            }
+        }
 
         // Итоговая стоимость
         const total = (price + customs) * usdToRubRate + logisticsTotal;
         document.getElementById('result').innerText = `Итоговая стоимость: ${total.toFixed(2)} ₽`;
     } catch (error) {
         console.error("Ошибка:", error);
-        alert("Произошла ошибка при расчете. Проверьте консоль.");
+        alert("Произошла ошибка при расчете. Проверьте консоль для подробностей.");
     }
 }
+
 
 // Запрашиваем курс USD/RUB при загрузке страницы
 getUsdToRubRate();
