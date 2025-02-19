@@ -4,23 +4,15 @@ let usdToRubRate = 91; // Курс USD/RUB
 // Находим элемент на странице для отображения курса USDT/RUB
 const usdtRubRateElement = document.getElementById("usdt-rub-rate");
 
-// Функция для получения курса USDT/RUB
 async function fetchUsdtRubRate() {
     try {
-        // Используем API для получения курса USDT/RUB
-        const response = await fetch('https://api.cryptonator.com/api/ticker/usdt-rub');
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub');
         const data = await response.json();
-
-        if (data.success) {
-            const usdtToRubRate = parseFloat(data.ticker.price); // Текущая цена
-            console.log(`📈 Курс USDT/RUB: ${usdtToRubRate}`);
-            
-            // Обновляем HTML
-            if (usdtRubRateElement) {
-                usdtRubRateElement.innerText = usdtToRubRate.toFixed(2); // Округляем до 2 знаков
-            }
-        } else {
-            throw new Error('Ошибка получения данных');
+        const usdtToRubRate = parseFloat(data.tether.rub);
+        console.log(`📈 Курс USDT/RUB: ${usdtToRubRate}`);
+        
+        if (usdtRubRateElement) {
+            usdtRubRateElement.innerText = usdtToRubRate.toFixed(2);
         }
     } catch (error) {
         console.error("❌ Ошибка загрузки курса USDT/RUB:", error);
@@ -30,10 +22,8 @@ async function fetchUsdtRubRate() {
     }
 }
 
-// Получаем курс каждые 10 секунд
 fetchUsdtRubRate(); // Первый запрос
 setInterval(fetchUsdtRubRate, 10000); // Повторяем каждые 10 секунд
-
 // Получение курса USD/RUB через прокси-сервер
 async function getUsdToRubRate() {
     try {
