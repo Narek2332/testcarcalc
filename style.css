@@ -60,6 +60,12 @@ input:focus, select:focus {
     outline: none;
 }
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+
+}
+
 select {
     appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300c3ff'><path d='M7 10l5 5 5-5z'/></svg>");
