@@ -92,20 +92,20 @@ async function calculate() {
         // === Расчет таможенных пошлин ===
         let customs = 0;
 
-        if (declarant === "individual" && age === "0-3" || declarant === "legal" && age === "0-3" ) {
-            customs = price * 0.485; // 48.5% от цены
+        if (age === "0-3"  ) {
+            customs = price * 0.485 * usdToRubRate ; // 48.5% от цены
         } else {
             if (declarant === "individual") {
                 // Физическое лицо
                 if (engineType === "petrol-diesel" || engineType === "hybrid") {
                     if (age === "3-5") {
-                        if (engineVolume === "1.5-2.0") customs = 5700;
-                        else if (engineVolume === "2.0-2.5") customs = 7860;
-                        else if (engineVolume === "2.5-3.0") customs = 9400;
+                        if (engineVolume === "1.5-2.0") customs = 5700 * usdToRubRate ;
+                        else if (engineVolume === "2.0-2.5") customs = 7860 * usdToRubRate ;
+                        else if (engineVolume === "2.5-3.0") customs = 9400 * usdToRubRate ;
                     } else if (age === "5-7") {
-                        if (engineVolume === "1.5-2.0") customs = 10000;
-                        else if (engineVolume === "2.0-2.5") customs = 13000;
-                        else if (engineVolume === "2.5-3.0") customs = 15600;
+                        if (engineVolume === "1.5-2.0") customs = 10000 * usdToRubRate ;
+                        else if (engineVolume === "2.0-2.5") customs = 13000 * usdToRubRate ;
+                        else if (engineVolume === "2.5-3.0") customs = 15600 * usdToRubRate ;
                     }
                 }
             } else if (declarant === "legal") {
