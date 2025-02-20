@@ -24,6 +24,7 @@ async function fetchUsdtRubRate() {
 
 fetchUsdtRubRate(); // Первый запрос
 setInterval(fetchUsdtRubRate, 10000); // Повторяем каждые 10 секунд
+
 // Получение курса USD/RUB через прокси-сервер
 async function getUsdToRubRate() {
     try {
@@ -41,9 +42,20 @@ async function getUsdToRubRate() {
     }
 }
 
+// Функция для получения актуального курса валют
+async function getExchangeRates() {
+    try {
+        await getUsdToRubRate(); // Функция обновляет переменную usdToRubRate
+    } catch (error) {
+        console.error("Ошибка получения курса валют:", error);
+        alert("Ошибка при обновлении курса валют!");
+    }
+}
+
 // Основная функция расчета
 async function calculate() {
     try {
+        // Получаем данные из формы
         const price = parseFloat(document.getElementById('price').value);
         const country = document.getElementById('country').value;
         const declarant = document.getElementById('declarant').value;
@@ -51,62 +63,81 @@ async function calculate() {
         const engineVolume = document.getElementById('engineVolume').value;
         const age = document.getElementById('age').value;
 
+        // Проверяем корректность введенной стоимости авто
         if (isNaN(price) || price <= 0) {
             alert("Введите корректную стоимость авто!");
             return;
         }
 
-        // Обновляем курс USD/RUB
-        await getUsdToRubRate();
+        // Обновляем курс валют
+        await getExchangeRates();
 
-        // Логистика
-        let logisticsUsdt = country === "USA" ? 4105 : 4050;
+        // === Логистика (зависит от страны) ===
+        let logisticsUsdt = 0;
         let logisticsRub = 110000; // Брокерские услуги / ЕЛПТС
 
-        // Конвертируем логистику в рубли
+        if (country === "USA") {
+            logisticsUsdt = 4105;
+        } else if (country === "Корея") {
+            logisticsUsdt = 4050;
+        } else {
+            alert("Выберите корректную страну!");
+            return;
+        }
+
+        // Конвертация логистики в рубли
         const logisticsRubC = logisticsUsdt * usdtToRubRate;
         const logisticsTotal = logisticsRubC + logisticsRub;
 
-        // Таможня
+        // === Расчет таможенных пошлин ===
         let customs = 0;
+
         if (age === "0-3") {
-            customs = price * 0.485; // 48.5%
+            customs = price * 0.485; // 48.5% от цены
         } else {
             if (declarant === "individual") {
+                // Физическое лицо
                 if (engineType === "petrol-diesel") {
-                    if (engineVolume === "1.5-2.0") customs = 5700;
-                    else if (engineVolume === "2.0-2.5") customs = 7860;
-                    else if (engineVolume === "2.5-3.0") customs = 9400;
-                }
-                if (age === "5-7") {
-                    if (engineVolume === "1.5-2.0") customs = 10000;
-                    else if (engineVolume === "2.0-2.5") customs = 13000;
-                    else if (engineVolume === "2.5-3.0") customs = 15600;
+                    if (age === "3-5") {
+                        if (engineVolume === "1.5-2.0") customs = 5700;
+                        else if (engineVolume === "2.0-2.5") customs = 7860;
+                        else if (engineVolume === "2.5-3.0") customs = 9400;
+                    } else if (age === "5-7") {
+                        if (engineVolume === "1.5-2.0") customs = 10000;
+                        else if (engineVolume === "2.0-2.5") customs = 13000;
+                        else if (engineVolume === "2.5-3.0") customs = 15600;
+                    }
                 }
             } else if (declarant === "legal") {
-                // Добавляем коммерческий утиль для юр. лиц
-                const util = engineVolume === "1.5-2.0" ? 1174000 : 2840000;
+                // Юридическое лицо
+                let util = 0;
+                if (engineVolume === "1.5-2.0") util = 1174000;
+                else if (engineVolume === "2.0-2.5") util = 2840000;
+                else if (engineVolume === "2.5-3.0") util = 2840000;
+
                 if (engineType === "petrol-diesel") {
-                    if (engineVolume === "1.5-2.0") customs = 5700 * usdToRubRate + util;
-                    else if (engineVolume === "2.0-2.5") customs = 7860 * usdToRubRate + util;
-                    else if (engineVolume === "2.5-3.0") customs = 9400 * usdToRubRate + util;
-                }
-                if (age === "5-7") {
-                    if (engineVolume === "1.5-2.0") customs = 10000 * usdToRubRate + util;
-                    else if (engineVolume === "2.0-2.5") customs = 13000 * usdToRubRate + util;
-                    else if (engineVolume === "2.5-3.0") customs = 15600 * usdToRubRate + util;
+                    if (age === "3-5") {
+                        if (engineVolume === "1.5-2.0") customs = 5700 * usdToRubRate + util;
+                        else if (engineVolume === "2.0-2.5") customs = 7860 * usdToRubRate + util;
+                        else if (engineVolume === "2.5-3.0") customs = 9400 * usdToRubRate + util;
+                    } else if (age === "5-7") {
+                        if (engineVolume === "1.5-2.0") customs = 10000 * usdToRubRate + util;
+                        else if (engineVolume === "2.0-2.5") customs = 13000 * usdToRubRate + util;
+                        else if (engineVolume === "2.5-3.0") customs = 15600 * usdToRubRate + util;
+                    }
                 }
             }
         }
 
-        // Итоговая стоимость
+        // === Итоговая стоимость ===
         const total = (price + customs) * usdToRubRate + logisticsTotal;
         document.getElementById('result').innerText = `Итоговая стоимость: ${total.toFixed(2)} ₽`;
     } catch (error) {
-        console.error("Ошибка:", error);
+        console.error("Ошибка расчета:", error);
         alert("Произошла ошибка при расчете. Проверьте консоль для подробностей.");
     }
 }
+
 
 
 // Запрашиваем курс USD/RUB при загрузке страницы
