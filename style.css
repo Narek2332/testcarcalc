@@ -43,7 +43,7 @@ h2 {
     position: relative;
 }
 
-select {
+select, input {
     width: 100%;
     padding: 14px 15px;
     border: 2px solid #3d3d3d;
@@ -52,18 +52,11 @@ select {
     color: #fff;
     font-size: 1rem;
     transition: all 0.3s ease;
+    box-sizing: border-box; /* Учитываем padding и border */
+    display: block; /* Исправляем поведение */
 }
 
-input {
-    width: 92%;
-    padding: 14px 15px;
-    border: 2px solid #3d3d3d;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
+
 
 input:focus, select:focus {
     border-color: #00c3ff;
