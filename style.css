@@ -43,8 +43,19 @@ h2 {
     position: relative;
 }
 
-input, select {
+select {
     width: 100%;
+    padding: 14px 15px;
+    border: 2px solid #3d3d3d;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input {
+    width: 92%;
     padding: 14px 15px;
     border: 2px solid #3d3d3d;
     border-radius: 8px;
