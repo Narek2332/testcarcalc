@@ -78,7 +78,7 @@ async function calculate() {
 
         if (country === "USA") {
             logisticsUsdt = 4105;
-        } else if (country === "Корея") {
+        } else if (country === "Korea") {
             logisticsUsdt = 4050;
         } else {
             alert("Выберите корректную страну!");
@@ -130,7 +130,7 @@ async function calculate() {
         }
 
         // === Итоговая стоимость ===
-        const total = (price + customs) * usdToRubRate + logisticsTotal;
+        const total = price * usdToRubRate + customs + logisticsTotal;
         document.getElementById('result').innerText = `Итоговая стоимость: ${total.toFixed(2)} ₽`;
     } catch (error) {
         console.error("Ошибка расчета:", error);
