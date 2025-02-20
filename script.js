@@ -130,7 +130,7 @@ async function calculate() {
         }
 
         // === Итоговая стоимость ===
-        const total = price * usdToRubRate + customs + logisticsTotal;
+        const total = price * usdtToRubRate + customs + logisticsTotal;
         document.getElementById('result').innerText = `Итоговая стоимость: ${total.toFixed(2)} ₽`;
     } catch (error) {
         console.error("Ошибка расчета:", error);
