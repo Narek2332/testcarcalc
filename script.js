@@ -97,7 +97,7 @@ async function calculate() {
         } else {
             if (declarant === "individual") {
                 // Физическое лицо
-                if (engineType === "petrol-diesel") {
+                if (engineType === "petrol-diesel" || engineType === "hybrid") {
                     if (age === "3-5") {
                         if (engineVolume === "1.5-2.0") customs = 5700;
                         else if (engineVolume === "2.0-2.5") customs = 7860;
@@ -115,7 +115,7 @@ async function calculate() {
                 else if (engineVolume === "2.0-2.5") util = 2840000;
                 else if (engineVolume === "2.5-3.0") util = 2840000;
 
-                if (engineType === "petrol-diesel") {
+                if (engineType === "petrol-diesel" || engineType === "hybrid") {
                     if (age === "3-5") {
                         if (engineVolume === "1.5-2.0") customs = 5700 * usdToRubRate + util;
                         else if (engineVolume === "2.0-2.5") customs = 7860 * usdToRubRate + util;
