@@ -92,7 +92,7 @@ async function calculate() {
         // === Расчет таможенных пошлин ===
         let customs = 0;
 
-        if (age === "0-3") {
+        if (declarant === "individual" && age === "0-3" || declarant === "legal" && age === "0-3" ) {
             customs = price * 0.485; // 48.5% от цены
         } else {
             if (declarant === "individual") {
