@@ -23,7 +23,7 @@ async function fetchUsdtRubRate() {
 }
 
 fetchUsdtRubRate(); // Первый запрос
-setInterval(fetchUsdtRubRate, 10000); // Повторяем каждые 10 секунд
+//setInterval(fetchUsdtRubRate, 10000); // Повторяем каждые 10 секунд
 
 // Получение курса USD/RUB через прокси-сервер
 async function getUsdToRubRate() {
@@ -46,6 +46,7 @@ async function getUsdToRubRate() {
 async function getExchangeRates() {
     try {
         await getUsdToRubRate(); // Функция обновляет переменную usdToRubRate
+        await fetchUsdtRubRate();
     } catch (error) {
         console.error("Ошибка получения курса валют:", error);
         alert("Ошибка при обновлении курса валют!");
@@ -71,7 +72,7 @@ async function calculate() {
 
         // Обновляем курс валют
         await getExchangeRates();
-
+        
         // === Логистика (зависит от страны) ===
         let logisticsUsdt = 0;
         let logisticsRub = 110000; // Брокерские услуги / ЕЛПТС
